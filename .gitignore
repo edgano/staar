@@ -1,0 +1,10 @@
+*.nfs*
+work/
+results/
+data/
+.nextflow*
+report*
+trace*
+.ipynb_checkpoints
+.DS_Store
+*.pyc
