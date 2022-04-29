@@ -15,24 +15,19 @@
             ],
             "properties": {
                 "aGDSdir": {
-                    "type": "string",
-                    "default": "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/STAARpipeline/data/input_test/agds_dir.Rdata"
+                    "type": "string"
                 },
                 "jobNum": {
-                    "type": "string",
-                    "default": "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/STAARpipeline/data/input_test/jobs_num.Rdata"
+                    "type": "string"
                 },
                 "nullModel": {
-                    "type": "string",
-                    "default": "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/STAARpipeline/results/Null_Model/obj.STAAR.fbc_neut.Rdata"
+                    "type": "string"
                 },
                 "nameCatalog": {
-                    "type": "string",
-                    "default": "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/STAARpipeline/data/input/Annotation_name_catalog.txt"
+                    "type": "string"
                 },
                 "agdsFiles": {
-                    "type": "string",
-                    "default": "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/final_release_freeze_GDS/gt_phased_Ensembl_regulatory_build/GDS_files/*.gds"
+                    "type": "string"
                 }
             }
         },
@@ -94,17 +89,19 @@
                     "type": "string",
                     "format": "directory-path",
                     "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
-                    "fa_icon": "fas fa-folder-open"
+                    "fa_icon": "fas fa-folder-open",
+                    "default": "${projectDir}/results"
                 },
                 "reportdir": {
                     "type": "string",
-                    "default": "/Users/en6/projects/staar/reports"
+                    "fa_icon": "fas fa-folder-open",
+                    "default": "${params.outdir}/reports"
                 },
                 "tracedir": {
                     "type": "string",
                     "description": "Directory to keep pipeline Nextflow logs and reports.",
-                    "default": "${params.outdir}/pipeline_info",
-                    "fa_icon": "fas fa-cogs"
+                    "fa_icon": "fas fa-folder-open",
+                    "default": "${params.outdir}/pipeline_info"
                 }
             }
         }
