@@ -102,6 +102,11 @@
                     "description": "Directory to keep pipeline Nextflow logs and reports.",
                     "fa_icon": "fas fa-folder-open",
                     "default": "${params.outdir}/pipeline_info"
+                },
+                "singularity_use_pre_cached_images": {
+                    "type": "boolean",
+                    "fa_icon": "fa-solid fa-container-storage",
+                    "default": "true"
                 }
             }
         }
