@@ -74,7 +74,7 @@ nextflow.enable.dsl=2
 
 ## file directory of aGDS file (genotype and annotation data) 
         # dir.geno <- "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/final_release_freeze_GDS/gt_phased_GDS/"
-dir.geno <- $aGDS
+dir_geno <- $aGDS
 
 ## file name of aGDS, separate by chr number 
 adgs_file_name_1 <- "interval_wgs.chr"
@@ -93,7 +93,7 @@ output_path <- $params.output
         ###############################
 
 #### aGDS directory
-agds_dir <- paste0(dir.geno,adgs_file_name_1,seq(1,22),agds_file_name_2) 
+agds_dir <- paste0(dir_geno,adgs_file_name_1,seq(1,22),agds_file_name_2) 
         #save(agds_dir,file=paste0(output_path,"agds_dir.Rdata",sep=""))
 save(agds_dir,file=paste0(".","agds_dir.Rdata",sep=""))
 
