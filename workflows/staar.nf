@@ -1,5 +1,7 @@
 #!/bin/bash nextflow
 
+nextflow.enable.dsl=2
+
 // STAAR docker image 
 //                  docker pull zilinli/staarpipeline:0.9.6
 //  https://github.com/xihaoli/STAARpipeline-Tutorial#association-analysis-using-staarpipeline
@@ -50,11 +52,13 @@
 
     process analysisPreStep {     
         input:
-        path aGDS
+            path aGDS
+
         output:
-        path "*_dir.Rdata", emit: agds_dir
-        path "*_catalog.Rdata", emit: annotation_name
-        path "*_num.Rdata", emit: jobs_num
+            path '*_dir.Rdata', emit: agds_dir
+            path '*_catalog.Rdata', emit: annotation_name
+            path '*_num.Rdata', emit: jobs_num
+
         script:
         """
         #!/usr/bin/env Rscript
@@ -90,7 +94,7 @@ output_path <- $params.output
 
 #### aGDS directory
 agds_dir <- paste0(dir.geno,adgs_file_name_1,seq(1,22),agds_file_name_2) 
-#save(agds_dir,file=paste0(output_path,"agds_dir.Rdata",sep=""))
+        #save(agds_dir,file=paste0(output_path,"agds_dir.Rdata",sep=""))
 save(agds_dir,file=paste0(".","agds_dir.Rdata",sep=""))
 
 #### Annotation dir -> SEEMS ITS NOT NEEDED IN THIS STEP
@@ -130,7 +134,7 @@ jobs_num <- cbind(jobs_num,ceiling((jobs_num[,3]-jobs_num[,2])/1.5e6))
 colnames(jobs_num) <- c("chr","start_loc","end_loc","individual_analysis_num","sliding_window_num","scang_num")
 jobs_num <- as.data.frame(jobs_num)
 
-# save(jobs_num,file=paste0(output_path,"jobs_num.Rdata",sep=""))
+        # save(jobs_num,file=paste0(output_path,"jobs_num.Rdata",sep=""))
 save(jobs_num,file=paste0(".","jobs_num.Rdata",sep=""))
 
         """
