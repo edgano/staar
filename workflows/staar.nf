@@ -36,15 +36,6 @@
                     .fromPath(params.nullModel, checkIfExists:true)
     nameCatalog_ch = Channel
                     .fromPath(params.nameCatalog, checkIfExists:true)
-    /*
-========================================================================================
-    CONFIG FILES
-========================================================================================
-*/
-
-//ch_multiqc_config        = file("$projectDir/../assets/multiqc_config.yaml", checkIfExists: true)
-//ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config) : Channel.empty()
-
 /*
 ========================================================================================
     IMPORT LOCAL MODULES/SUBWORKFLOWS
@@ -57,10 +48,10 @@
         // Script: Association_Analysis_PreStep.r
         // path new script : /nfs/team151/software/STAARpipeline_INTERVAL/final
 
-
     process analysisPreStep {     
         input:
         file aGDS
+
         output:
         file "*_dir.Rdata", emit: agds_dir
         file "*_catalog.Rdata", emit: annotation_name
@@ -79,15 +70,20 @@
         ###############################
 
 ## file directory of aGDS file (genotype and annotation data) 
-dir.geno <- "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/final_release_freeze_GDS/gt_phased_GDS/"
+        # dir.geno <- "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/final_release_freeze_GDS/gt_phased_GDS/"
+dir.geno <- $aGDS
+
 ## file name of aGDS, separate by chr number 
 adgs_file_name_1 <- "interval_wgs.chr"
 agds_file_name_2 <- ".gt_phased.gds"
-## channel name of the QC label in the GDS/aGDS file
-QC_label <- "annotation/info/QC_label"
-## file directory for the output files
-output_path <- "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/STAARpipeline/data/input/"
 
+## channel name of the QC label in the GDS/aGDS file
+        #QC_label <- "annotation/info/QC_label"
+QC_label <- $params.qcLabel
+
+## file directory for the output files
+        #output_path <- "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/STAARpipeline/data/input/"
+output_path <- $params.output
 
         ###############################
         #        Main Function
@@ -97,8 +93,9 @@ output_path <- "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/
 agds_dir <- paste0(dir.geno,adgs_file_name_1,seq(1,22),agds_file_name_2) 
 save(agds_dir,file=paste0(output_path,"agds_dir.Rdata",sep=""))
 
-#### Annotation dir
-Annotation_name_catalog <- "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/STAARpipeline/data/input/Annotation_name_catalog.txt"
+#### Annotation dir -> SEEMS ITS NOT NEEDED IN THIS STEP
+        #Annotation_name_catalog <- "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/STAARpipeline/data/input/Annotation_name_catalog.txt"
+#Annotation_name_catalog <- $params.annotationNameCatalog
 
 #### jobs_num
 jobs_num <- matrix(rep(0,66),nrow=22)
@@ -123,8 +120,10 @@ for(chr in 1:22)
 
 # Individual Analysis
 jobs_num <- cbind(jobs_num,ceiling((jobs_num[,3]-jobs_num[,2])/10e6))
+
 # Sliding Window
 jobs_num <- cbind(jobs_num,ceiling((jobs_num[,3]-jobs_num[,2])/5e6))
+
 # SCANG
 jobs_num <- cbind(jobs_num,ceiling((jobs_num[,3]-jobs_num[,2])/1.5e6))
 
@@ -132,7 +131,6 @@ colnames(jobs_num) <- c("chr","start_loc","end_loc","individual_analysis_num","s
 jobs_num <- as.data.frame(jobs_num)
 
 save(jobs_num,file=paste0(output_path,"jobs_num.Rdata",sep=""))
-
         """
     }
     // Step 1: Fit STAAR null model
@@ -580,7 +578,7 @@ workflow STAAR {
 
     //main:
     //Step 0: Preparation for association analysis of whole-genome/whole-exome sequencing studies
-    //analysisPreStep(inputAgds)
+    analysisPreStep(aGDSdir_ch)
 
     //Step 1: Fit STAAR null model
     //fitNullModel(phenoCSV, sGRM)
@@ -597,15 +595,15 @@ workflow STAAR {
     //Step 4: Sliding window analysis
     //slidingWindow(aGDS, fitNullModel.out.objNullModel)
         //slidingWindow(arrayId, aGDSdir,nullModel,jobNum,nameCatalog)
-	aux_ch = aGDSdir_ch.combine(nullModel_ch)
-	aux2 = aux_ch.combine(jobNum_ch)
-    aux3 = aux2.combine(nameCatalog_ch)
+	//aux_ch = aGDSdir_ch.combine(nullModel_ch)
+	//aux2 = aux_ch.combine(jobNum_ch)
+    //aux3 = aux2.combine(nameCatalog_ch)
     
-    phenoCh = arrayId_ch.combine(aux3).view() //,nullModel,jobNum,nameCatalog).view()    //try to concat to "expand" the arrayId 
+    //phenoCh = arrayId_ch.combine(aux3).view() //,nullModel,jobNum,nameCatalog).view()    //try to concat to "expand" the arrayId 
         //TODO -> move kk to chnnel(1..200) to unwrap the for
     //slidingWindow_ch = arrayId.combine(slidingWindowPos_ch).view()
 
-    slidingWindow(phenoCh)
+    //slidingWindow(phenoCh)
         //slidingWindow(arrayId)
 
     // Step 5.0: Obtain SCANG-STAAR null model
