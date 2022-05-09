@@ -50,12 +50,11 @@
 
     process analysisPreStep {     
         input:
-        file aGDS
-
+        path aGDS
         output:
-        file "*_dir.Rdata", emit: agds_dir
-        file "*_catalog.Rdata", emit: annotation_name
-        file "*_num.Rdata", emit: jobs_num
+        path "*_dir.Rdata", emit: agds_dir
+        path "*_catalog.Rdata", emit: annotation_name
+        path "*_num.Rdata", emit: jobs_num
         script:
         """
         #!/usr/bin/env Rscript
