@@ -90,7 +90,8 @@ output_path <- $params.output
 
 #### aGDS directory
 agds_dir <- paste0(dir.geno,adgs_file_name_1,seq(1,22),agds_file_name_2) 
-save(agds_dir,file=paste0(output_path,"agds_dir.Rdata",sep=""))
+#save(agds_dir,file=paste0(output_path,"agds_dir.Rdata",sep=""))
+save(agds_dir,file=paste0(".","agds_dir.Rdata",sep=""))
 
 #### Annotation dir -> SEEMS ITS NOT NEEDED IN THIS STEP
         #Annotation_name_catalog <- "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/STAARpipeline/data/input/Annotation_name_catalog.txt"
