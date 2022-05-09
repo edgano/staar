@@ -129,7 +129,9 @@ jobs_num <- cbind(jobs_num,ceiling((jobs_num[,3]-jobs_num[,2])/1.5e6))
 colnames(jobs_num) <- c("chr","start_loc","end_loc","individual_analysis_num","sliding_window_num","scang_num")
 jobs_num <- as.data.frame(jobs_num)
 
-save(jobs_num,file=paste0(output_path,"jobs_num.Rdata",sep=""))
+# save(jobs_num,file=paste0(output_path,"jobs_num.Rdata",sep=""))
+save(jobs_num,file=paste0(".","jobs_num.Rdata",sep=""))
+
         """
     }
     // Step 1: Fit STAAR null model
