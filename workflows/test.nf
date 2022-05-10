@@ -31,7 +31,7 @@ nextflow.enable.dsl=2
             path aGDS
 
         output:
-            path '*_dir.Rdata', emit: agds_dir
+            path "*_dir.Rdata", emit: agds_dir
 
         script:
         """
@@ -48,7 +48,7 @@ nextflow.enable.dsl=2
 
 ## file directory of aGDS file (genotype and annotation data) 
         # dir.geno <- "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/final_release_freeze_GDS/gt_phased_GDS/"
-dir_geno <- $aGDS
+dir_geno <- "${params.aGDSdir}"
 
 ## file name of aGDS, separate by chr number 
 adgs_file_name_1 <- "interval_wgs.chr"
@@ -56,11 +56,11 @@ agds_file_name_2 <- ".gt_phased.gds"
 
 ## channel name of the QC label in the GDS/aGDS file
         #QC_label <- "annotation/info/QC_label"
-QC_label <- $params.qcLabel
+QC_label <- "${params.qcLabel}"
 
 ## file directory for the output files
         #output_path <- "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/STAARpipeline/data/input/"
-output_path <- $params.output
+output_path <- "${params.output}"
 
         ###############################
         #        Main Function
@@ -73,7 +73,7 @@ save(agds_dir,file=paste0(".","agds_dir.Rdata",sep=""))
 
 #### Annotation dir -> SEEMS ITS NOT NEEDED IN THIS STEP
         #Annotation_name_catalog <- "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/STAARpipeline/data/input/Annotation_name_catalog.txt"
-#Annotation_name_catalog <- $params.annotationNameCatalog
+#Annotation_name_catalog <- ${params.annotationNameCatalog}
 
 #### jobs_num
 jobs_num <- matrix(rep(0,66),nrow=22)

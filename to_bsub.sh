@@ -15,6 +15,6 @@ mkdir -p $TMPDIR
 
 nextflow run main.nf \
      --singularity_use_pre_cached_images \
-	 -profile lsf test_data \
+	 -profile lsf, test_data \
 	 -resume
 
