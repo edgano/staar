@@ -10,11 +10,11 @@ export TMPDIR="$PWD/tmpdir"
 mkdir -p $TMPDIR
 
 # load conda env where nextflow is installed
-eval "$(conda shell.bash hook)"
-conda activate nextflow
+#eval "$(conda shell.bash hook)"
+#conda activate nextflow
 
 nextflow run main.nf \
      --singularity_use_pre_cached_images \
-	 -profile lsf \
+	 -profile lsf test_data \
 	 -resume
 
