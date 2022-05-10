@@ -9,16 +9,11 @@ nextflow.enable.dsl=2
 
     slidingWindowPos_ch = Channel.from( 1..2 ) // for loop slidingWindow 1-200
 
-    agdsFiles_ch = Channel
-                    .fromPath(params.agdsFiles, checkIfExists:true)
-    aGDSdir_ch = Channel
-                    .fromPath(params.aGDSdir, checkIfExists:true).view()
-    jobNum_ch = Channel
-                    .fromPath(params.jobNum, checkIfExists:true)
-    nullModel_ch = Channel
-                    .fromPath(params.nullModel, checkIfExists:true)
-    nameCatalog_ch = Channel
-                    .fromPath(params.nameCatalog, checkIfExists:true)
+    agdsFiles_ch = Channel.fromPath(params.agdsFiles, checkIfExists:true)
+    aGDSdir_ch = Channel.fromPath(params.aGDSdir, checkIfExists:true).view()
+    jobNum_ch = Channel.fromPath(params.jobNum, checkIfExists:true)
+    nullModel_ch = Channel.fromPath(params.nullModel, checkIfExists:true)
+    nameCatalog_ch = Channel.fromPath(params.nameCatalog, checkIfExists:true)
 /*
 ========================================================================================
     IMPORT LOCAL MODULES/SUBWORKFLOWS
