@@ -11,10 +11,8 @@ nextflow.enable.dsl=2
 
     agdsFiles_ch = Channel.fromPath(params.agdsFiles, checkIfExists:true)
     aGDSdir_ch = Channel.fromPath(params.aGDSdir, checkIfExists:true).view()
-    jobNum_ch = Channel.fromPath(params.jobNum, checkIfExists:true)
-    nullModel_ch = Channel.fromPath(params.nullModel, checkIfExists:true)
-    nameCatalog_ch = Channel.fromPath(params.nameCatalog, checkIfExists:true)
-/*
+
+    /*
 ========================================================================================
     IMPORT LOCAL MODULES/SUBWORKFLOWS
 ========================================================================================
@@ -26,13 +24,16 @@ nextflow.enable.dsl=2
         // Script: Association_Analysis_PreStep.r
         // path new script : /nfs/team151/software/STAARpipeline_INTERVAL/final
 
-    process analysisPreStep {     
+    process analysisPreStep {    
+        publishDir "${params.outDirStep0}/agds", mode: 'copy', overwrite: false, pattern: "*_dir.Rdata"
+        publishDir "${params.outDirStep0}/jobNum", mode: 'copy', overwrite: false, pattern: "*_num.Rdata"
+        
         input:
             path aGDS
 
         output:
             path "*_dir.Rdata", emit: agds_dir
-
+            path '*_num.Rdata', emit: jobs_num
         script:
         """
         #!/usr/bin/env Rscript
@@ -60,7 +61,7 @@ QC_label <- "${params.qcLabel}"
 
 ## file directory for the output files
         #output_path <- "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/STAARpipeline/data/input/"
-output_path <- "${params.output}"
+output_path <- "./"
 
         ###############################
         #        Main Function
@@ -69,7 +70,7 @@ output_path <- "${params.output}"
 #### aGDS directory
 agds_dir <- paste0(dir_geno,adgs_file_name_1,seq(1,22),agds_file_name_2) 
         #save(agds_dir,file=paste0(output_path,"agds_dir.Rdata",sep=""))
-save(agds_dir,file=paste0(".","agds_dir.Rdata",sep=""))
+save(agds_dir,file=paste0(output_path,"agds_dir.Rdata",sep=""))
 
 #### Annotation dir -> SEEMS ITS NOT NEEDED IN THIS STEP
         #Annotation_name_catalog <- "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/STAARpipeline/data/input/Annotation_name_catalog.txt"
@@ -109,7 +110,7 @@ colnames(jobs_num) <- c("chr","start_loc","end_loc","individual_analysis_num","s
 jobs_num <- as.data.frame(jobs_num)
 
         # save(jobs_num,file=paste0(output_path,"jobs_num.Rdata",sep=""))
-save(jobs_num,file=paste0(".","jobs_num.Rdata",sep=""))
+save(jobs_num,file=paste0(output_path,"jobs_num.Rdata",sep=""))
 
         """
     }
