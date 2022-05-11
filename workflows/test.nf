@@ -9,7 +9,7 @@ nextflow.enable.dsl=2
 
     slidingWindowPos_ch = Channel.from( 1..2 ) // for loop slidingWindow 1-200
 
-    agdsFiles_ch = Channel.fromPath(params.agdsFiles, checkIfExists:true)
+    // agdsFiles_ch = Channel.fromPath(params.agdsFiles, checkIfExists:true)
     aGDSdir_ch = Channel.fromPath(params.aGDSdir, checkIfExists:true).view()
 
     // Step 1 NF way
@@ -217,7 +217,7 @@ nextflow.enable.dsl=2
             file nullModel
             val variantType
             val gene_missing_imputation
-            
+
         output:
             path "results_gene_centric_noncoding_*", emit: results
 
@@ -357,7 +357,7 @@ workflow TEST {
 
     //main:
     //Step 0: Preparation for association analysis of whole-genome/whole-exome sequencing studies
-    //analysisPreStep(aGDSdir_ch)
+    analysisPreStep(aGDSdir_ch)
 
     //step 01
     fitNullModel(phenoDir, pNum)
