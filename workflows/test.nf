@@ -363,7 +363,7 @@ workflow TEST {
     fitNullModel(phenoDir, pNum)
 
     //step 3.2
-    geneCentricNoCoding(jobsNum,
+    geneCentricNoCoding(jobNum,
                         analysisPreStep.out.agds_dirFile,
                         fitNullModel.out.objNullModel,
                         variantType,
