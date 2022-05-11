@@ -2,9 +2,12 @@
 work/
 results/
 data/
+tmp/
+tmpdir/
 .nextflow*
 report*
 trace*
 .ipynb_checkpoints
 .DS_Store
 *.pyc
+to_bsub.sh

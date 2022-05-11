@@ -49,16 +49,16 @@ nextflow.enable.dsl=2
         // Output: agds_dir.Rdata, Annotation_name_catalog.Rdata, jobs_num.Rdata.
         // Script: Association_Analysis_PreStep.r
         // path new script : /nfs/team151/software/STAARpipeline_INTERVAL/final
-
-    process analysisPreStep {     
+    process analysisPreStep {    
+        publishDir "${params.outDirStep0}", mode: 'copy', overwrite: false, pattern: "*_dir.Rdata"
+        publishDir "${params.outDirStep0}", mode: 'copy', overwrite: false, pattern: "*_num.Rdata"
+        
         input:
             path aGDS
 
         output:
-            path '*_dir.Rdata', emit: agds_dir
-            path '*_catalog.Rdata', emit: annotation_name
+            path "*_dir.Rdata", emit: agds_dir
             path '*_num.Rdata', emit: jobs_num
-
         script:
         """
         #!/usr/bin/env Rscript
@@ -72,113 +72,66 @@ nextflow.enable.dsl=2
         #           Input
         ###############################
 
-## file directory of aGDS file (genotype and annotation data) 
-        # dir.geno <- "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/final_release_freeze_GDS/gt_phased_GDS/"
-dir_geno <- $aGDS
+        ## file directory of aGDS file (genotype and annotation data) 
+                # dir.geno <- "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/final_release_freeze_GDS/gt_phased_GDS/"
+        dir_geno <- "${params.aGDSdir}"
 
-## file name of aGDS, separate by chr number 
-adgs_file_name_1 <- "interval_wgs.chr"
-agds_file_name_2 <- ".gt_phased.gds"
+        ## file name of aGDS, separate by chr number 
+        adgs_file_name_1 <- "interval_wgs.chr"
+        agds_file_name_2 <- ".gt_phased.gds"
 
-## channel name of the QC label in the GDS/aGDS file
-        #QC_label <- "annotation/info/QC_label"
-QC_label <- $params.qcLabel
+        ## channel name of the QC label in the GDS/aGDS file
+                #QC_label <- "annotation/info/QC_label"
+        QC_label <- "${params.qcLabel}"
 
-## file directory for the output files
-        #output_path <- "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/STAARpipeline/data/input/"
-output_path <- $params.output
+        ## file directory for the output files
+                #output_path <- "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/STAARpipeline/data/input/"
+        output_path <- "./"
 
-        ###############################
-        #        Main Function
-        ###############################
+                ###############################
+                #        Main Function
+                ###############################
 
-#### aGDS directory
-agds_dir <- paste0(dir_geno,adgs_file_name_1,seq(1,22),agds_file_name_2) 
-        #save(agds_dir,file=paste0(output_path,"agds_dir.Rdata",sep=""))
-save(agds_dir,file=paste0(".","agds_dir.Rdata",sep=""))
+        #### aGDS directory
+        agds_dir <- paste0(dir_geno,adgs_file_name_1,seq(1,22),agds_file_name_2) 
+                #save(agds_dir,file=paste0(output_path,"agds_dir.Rdata",sep=""))
+        save(agds_dir,file=paste0(output_path,"agds_dir.Rdata",sep=""))
 
-#### Annotation dir -> SEEMS ITS NOT NEEDED IN THIS STEP
-        #Annotation_name_catalog <- "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/STAARpipeline/data/input/Annotation_name_catalog.txt"
-#Annotation_name_catalog <- $params.annotationNameCatalog
+        #### jobs_num
+        jobs_num <- matrix(rep(0,66),nrow=22)
+        for(chr in 1:22)
+        {
+            print(chr)
+            gds.path <- agds_dir[chr]
+            genofile <- seqOpen(gds.path)
+            
+            filter <- seqGetData(genofile, QC_label)
+            SNVlist <- filter == "PASS" 
+            
+            position <- as.numeric(seqGetData(genofile, "position"))
+            position_SNV <- position[SNVlist]
+            
+            jobs_num[chr,1] <- chr
+            jobs_num[chr,2] <- min(position[SNVlist])
+            jobs_num[chr,3] <- max(position[SNVlist])
+            
+            seqClose(genofile)
+        }
 
-#### jobs_num
-jobs_num <- matrix(rep(0,66),nrow=22)
-for(chr in 1:22)
-{
-    print(chr)
-    gds.path <- agds_dir[chr]
-    genofile <- seqOpen(gds.path)
-    
-    filter <- seqGetData(genofile, QC_label)
-    SNVlist <- filter == "PASS" 
-    
-    position <- as.numeric(seqGetData(genofile, "position"))
-    position_SNV <- position[SNVlist]
-    
-    jobs_num[chr,1] <- chr
-    jobs_num[chr,2] <- min(position[SNVlist])
-    jobs_num[chr,3] <- max(position[SNVlist])
-    
-    seqClose(genofile)
-}
+        # Individual Analysis
+        jobs_num <- cbind(jobs_num,ceiling((jobs_num[,3]-jobs_num[,2])/10e6))
 
-# Individual Analysis
-jobs_num <- cbind(jobs_num,ceiling((jobs_num[,3]-jobs_num[,2])/10e6))
+        # Sliding Window
+        jobs_num <- cbind(jobs_num,ceiling((jobs_num[,3]-jobs_num[,2])/5e6))
 
-# Sliding Window
-jobs_num <- cbind(jobs_num,ceiling((jobs_num[,3]-jobs_num[,2])/5e6))
+        # SCANG
+        jobs_num <- cbind(jobs_num,ceiling((jobs_num[,3]-jobs_num[,2])/1.5e6))
 
-# SCANG
-jobs_num <- cbind(jobs_num,ceiling((jobs_num[,3]-jobs_num[,2])/1.5e6))
+        colnames(jobs_num) <- c("chr","start_loc","end_loc","individual_analysis_num","sliding_window_num","scang_num")
+        jobs_num <- as.data.frame(jobs_num)
 
-colnames(jobs_num) <- c("chr","start_loc","end_loc","individual_analysis_num","sliding_window_num","scang_num")
-jobs_num <- as.data.frame(jobs_num)
-
-        # save(jobs_num,file=paste0(output_path,"jobs_num.Rdata",sep=""))
-save(jobs_num,file=paste0(".","jobs_num.Rdata",sep=""))
-
-        """
-    }
-    // Step 1: Fit STAAR null model
-        // Input: Phenotype data and (sparse) genetic relatedness matrix. For more details, please see the R scripts.
-        // Output: a Rdata file of the STAAR null model.
-        // Script: STAARpipeline_Null_Model.r or STAARpipeline_Null_Model_GENESIS.r
-
-    process fitNullModel { 
-        input:
-        file phenotypeCsv
-        file sGRM
-        output:
-        file "*_nullmodel.Rdata", emit: objNullModel
-        script:
-        """
-        #!/usr/bin/env Rscript
-
-        library(gdsfmt)
-        library(SeqArray)
-        library(SeqVarTools)
-        library(STAAR)
-        library(STAARpipeline)
-        ###############################
-        #           Input
-        ###############################
-        ## Phenotype file
-        # phenotype <- read.csv("/path_to_the_file/pheno.csv")   <- nf input phenotypeCsv   
-        ## (sparse) GRM file
-        # sgrm <- get(load("/path_to_the_file/sGRM.Rdata"))     <- nf input sGRM 
-
-        ## output file name
-        output_name <- "obj_nullmodel.Rdata"    ## not sure if its needed
-
-        ###############################
-        #        Main Function
-        ###############################
-        ### fit null model
-        obj_nullmodel <- fit_nullmodel(LDLadj.norm~age+age2+sex+PC1+PC2+PC3+PC4+PC5+PC6+PC7+PC8+PC9+PC10+as.factor(study_race),data=$phenotypeCsv,
-                                    kins=$sGRM,use_sparse=TRUE,kins_cutoff=0.022,id="sample.id",family=gaussian(link="identity"),verbose=TRUE)
-
-        # TODO -> check if safe obj is correct
-        save(obj_nullmodel,file=paste0(".",output_name))
+                # save(jobs_num,file=paste0(output_path,"jobs_num.Rdata",sep=""))
+        save(jobs_num,file=paste0(output_path,"jobs_num.Rdata",sep=""))
 
         """
     }
