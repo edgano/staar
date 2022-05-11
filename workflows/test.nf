@@ -184,7 +184,7 @@ workflow TEST {
 
     //main:
     //Step 0: Preparation for association analysis of whole-genome/whole-exome sequencing studies
-    analysisPreStep(aGDSdir_ch)
+    //analysisPreStep(aGDSdir_ch)
 
     //step 01
     fitNullModel(phenoDir, pNum)
