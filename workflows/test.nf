@@ -239,13 +239,13 @@ nextflow.enable.dsl=2
         ###############################
             ## job nums
         #   jobs_num <- get(load("/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/STAARpipeline/data/input/jobs_num.Rdata"))
-        jobs_num <- get(load("${jobsNum}")
+        jobs_num <- get(load("${jobsNum}"))
             ## agds dir
         #   agds_dir <- get(load("/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/STAARpipeline/data/input/agds_dir.Rdata"))
-        agds_dir <- get(load("${agds_dirFile}")
+        agds_dir <- get(load("${agds_dirFile}"))
             ## Null Model
         #   obj_nullmodel <- get(load("/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/STAARpipeline/results/Null_Model/obj.STAAR.fbc_neut.Rdata"))
-        obj_nullmodel <- get(load("${nullModel}")
+        obj_nullmodel <- get(load("${nullModel}"))
 
         #trait <- "fbc_neut"
         trait <- "${params.trait}"
