@@ -31,8 +31,8 @@ nextflow.enable.dsl = 2
 ========================================================================================
 */
 
-include { ASSOCIATIONS } from "${projectDir}/workflows/associations"
-include { STAAR } from "${projectDir}/workflows/staar"
+// include { ASSOCIATIONS } from "${projectDir}/workflows/associations"
+// include { STAAR } from "${projectDir}/workflows/staar"
 include { TEST } from "${projectDir}/workflows/test"
 //
 // WORKFLOW: Run main nf-core/associations analysis pipeline
@@ -52,10 +52,11 @@ workflow NFCORE_ASSOCIATIONS {
 // WORKFLOW: Execute a single named workflow for the pipeline
 // See: https://github.com/nf-core/rnaseq/issues/619
 //
+/*
 workflow {
     NFCORE_ASSOCIATIONS ()
 }
-
+*/
 /*
 ========================================================================================
     THE END
