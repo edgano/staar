@@ -17,9 +17,9 @@ nextflow.enable.dsl=2
     pNum= '2'
 
     // Step 3.2
-    jobNum = params.jobNum
-    variantType = params.variantType
-    gene_missing_imputation = params.gene_missing_imputation
+    //jobNum = params.jobNum
+    //variantType = params.variantType
+    //gene_missing_imputation = params.gene_missing_imputation
 
     /*
 ========================================================================================
@@ -363,9 +363,9 @@ workflow TEST {
     fitNullModel(phenoDir, pNum)
 
     //step 3.2
-    geneCentricNoCoding(jobNum,
+    geneCentricNoCoding(params.jobNum,
                         analysisPreStep.out.agds_dirFile,
                         fitNullModel.out.objNullModel,
-                        variantType,
-                        gene_missing_imputation)
+                        params.variantType,
+                        params.gene_missing_imputation)
 }
