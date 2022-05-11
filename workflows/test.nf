@@ -10,7 +10,7 @@ nextflow.enable.dsl=2
     slidingWindowPos_ch = Channel.from( 1..2 ) // for loop slidingWindow 1-200
 
     // agdsFiles_ch = Channel.fromPath(params.agdsFiles, checkIfExists:true)
-    aGDSdir_ch = Channel.fromPath(params.aGDSdir, checkIfExists:true).view()
+    aGDSdir_ch = Channel.fromPath(params.aGDSdir, checkIfExists:true)
 
     // Step 1 NF way
     phenoDir = "/lustre/scratch119/humgen/projects/interval_wgs/analysis/phenotypes/all_phenotypes/fam/by_trait/wgs_cov_adj"
@@ -287,7 +287,7 @@ nextflow.enable.dsl=2
 
             ## input array id from batch file (Harvard FAS cluster)
         #   arrayid <- as.numeric(commandArgs(TRUE)[1])                    ## from 1 to sum(group.num.allchr) which is 379
-        arrayid <- as.numeric(${params.ArrayId}
+        arrayid <- as.numeric(${params.ArrayId})
 
        
         """
