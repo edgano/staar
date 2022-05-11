@@ -245,7 +245,7 @@ nextflow.enable.dsl=2
         agds_dir <- get(load("${agds_dirFile}")
             ## Null Model
         #   obj_nullmodel <- get(load("/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/STAARpipeline/results/Null_Model/obj.STAAR.fbc_neut.Rdata"))
-        obj_nullmodel <- get(load("${nullModell}")
+        obj_nullmodel <- get(load("${nullModel}")
 
         #trait <- "fbc_neut"
         trait <- "${params.trait}"
