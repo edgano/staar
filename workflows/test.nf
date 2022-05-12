@@ -212,7 +212,7 @@ nextflow.enable.dsl=2
         // publishDir "${params.outdir}/step3_2", mode: 'copy', overwrite: false, pattern: "results_gene_centric_noncoding_*"
         
         input:
-            file jobsNum
+            path jobsNum
             file agds_dirFile
             file nullModel
             val variantType
@@ -287,7 +287,7 @@ nextflow.enable.dsl=2
 
             ## input array id from batch file (Harvard FAS cluster)
         #   arrayid <- as.numeric(commandArgs(TRUE)[1])                    ## from 1 to sum(group.num.allchr) which is 379
-        arrayid <- as.numeric(${params.ArrayId})
+        arrayid <- as.numeric("${params.ArrayId}")
 
        
         """
