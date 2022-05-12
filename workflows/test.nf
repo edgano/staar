@@ -209,7 +209,7 @@ nextflow.enable.dsl=2
         // SCRIPT --> /nfs/team151/software/STAARpipeline_INTERVAL/final/STAARpipeline_Gene_Centric_Noncoding.R
 
     process geneCentricNoCoding {   
-        // publishDir "${params.outdir}/step3_2", mode: 'copy', overwrite: false, pattern: "results_gene_centric_noncoding_*"
+            publishDir "${params.outdir}/step3_2", mode: 'copy', overwrite: false, pattern: "results_gene_centric_noncoding_*"
         
         input:
             path jobsNum
@@ -219,7 +219,7 @@ nextflow.enable.dsl=2
             val gene_missing_imputation
 
         output:
-           // path "results_gene_centric_noncoding_*", emit: results
+            path "results_gene_centric_noncoding_*", emit: results
 
         script:
         """
