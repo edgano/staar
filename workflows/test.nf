@@ -288,12 +288,12 @@ nextflow.enable.dsl=2
             ## input array id from batch file (Harvard FAS cluster)
         #   arrayid <- as.numeric(commandArgs(TRUE)[1])                    ## from 1 to sum(group.num.allchr) which is 379
         arrayid <- as.numeric("${params.ArrayId}")
-        
+
 ###########################################################
 #           Main Function 
 ###########################################################
 ## gene number in job
-gene_num_in_array <- 50 
+gene_num_in_array <- 2 #50 
 group.num.allchr <- ceiling(table(genes_info[,2])/gene_num_in_array)
 sum(group.num.allchr)                                        
 
@@ -317,7 +317,7 @@ if (groupid < group.num)
 }	
 
 ### exclude large genes
-jobid_exclude <- c(21,39,44,45,46,53,55,83,88,103,114,127,135,150,154,155,163,164,166,180,189,195,200,233,280,285,295,313,318,319,324,327,363,44,45,54)
+jobid_exclude <- c(21,39) # ,44,45,46,53,55,83,88,103,114,127,135,150,154,155,163,164,166,180,189,195,200,233,280,285,295,313,318,319,324,327,363,44,45,54)
 sub_seq_id_exclude <- c(1009,1929,182,214,270,626,741,894,83,51,611,385,771,493,671,702,238,297,388,352,13,303,600,170,554,207,724,755,1048,319,324,44,411,195,236,677)
 	
 for (i in 1:length(jobid_exclude))
