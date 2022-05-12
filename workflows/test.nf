@@ -289,70 +289,206 @@ nextflow.enable.dsl=2
         #   arrayid <- as.numeric(commandArgs(TRUE)[1])                    ## from 1 to sum(group.num.allchr) which is 379
         arrayid <- as.numeric("${params.ArrayId}")
 
-###########################################################
-#           Main Function 
-###########################################################
-## gene number in job
-gene_num_in_array <- 2 #50 
-group.num.allchr <- ceiling(table(genes_info[,2])/gene_num_in_array)
-sum(group.num.allchr)                                        
+        ###########################################################
+        #           Main Function 
+        ###########################################################
+        ## gene number in job
+# FIX THE LENGHT
+        gene_num_in_array <- 2 #50 
+        group.num.allchr <- ceiling(table(genes_info[,2])/gene_num_in_array)
+        sum(group.num.allchr)                                        
 
-chr <- which.max(arrayid <= cumsum(group.num.allchr))
-group.num <- group.num.allchr[chr]
+        chr <- which.max(arrayid <= cumsum(group.num.allchr))
+        group.num <- group.num.allchr[chr]
 
-if (chr == 1){
-   groupid <- arrayid
-}  else  {
-   groupid <- arrayid - cumsum(group.num.allchr)[chr-1]
-}
+        if (chr == 1){
+        groupid <- arrayid
+        }  else  {
+        groupid <- arrayid - cumsum(group.num.allchr)[chr-1]
+        }
 
-genes_info_chr <- genes_info[genes_info[,2]==chr,]
-sub_seq_num <- dim(genes_info_chr)[1]
+        genes_info_chr <- genes_info[genes_info[,2]==chr,]
+        sub_seq_num <- dim(genes_info_chr)[1]
 
-if (groupid < group.num)
-{ 
-	sub_seq_id <- ((groupid - 1)*gene_num_in_array + 1):(groupid*gene_num_in_array)
-}  else  {
-	sub_seq_id <- ((groupid - 1)*gene_num_in_array + 1):sub_seq_num
-}	
+        if (groupid < group.num)
+        { 
+            sub_seq_id <- ((groupid - 1)*gene_num_in_array + 1):(groupid*gene_num_in_array)
+        }  else  {
+            sub_seq_id <- ((groupid - 1)*gene_num_in_array + 1):sub_seq_num
+        }	
+# FIX THE LENGHT
+        ### exclude large genes
+        jobid_exclude <- c(21,39) # ,44,45,46,53,55,83,88,103,114,127,135,150,154,155,163,164,166,180,189,195,200,233,280,285,295,313,318,319,324,327,363,44,45,54)
+        sub_seq_id_exclude <- c(1009,1929,182,214,270,626,741,894,83,51,611,385,771,493,671,702,238,297,388,352,13,303,600,170,554,207,724,755,1048,319,324,44,411,195,236,677)
+            
+        for (i in 1:length(jobid_exclude))
+        {
+            if (arrayid==jobid_exclude[i])
+            {
+                sub_seq_id <- setdiff(sub_seq_id,sub_seq_id_exclude[i])
+            }
+        }
 
-### exclude large genes
-jobid_exclude <- c(21,39) # ,44,45,46,53,55,83,88,103,114,127,135,150,154,155,163,164,166,180,189,195,200,233,280,285,295,313,318,319,324,327,363,44,45,54)
-sub_seq_id_exclude <- c(1009,1929,182,214,270,626,741,894,83,51,611,385,771,493,671,702,238,297,388,352,13,303,600,170,554,207,724,755,1048,319,324,44,411,195,236,677)
-	
-for (i in 1:length(jobid_exclude))
-{
-	if (arrayid==jobid_exclude[i])
-	{
-		sub_seq_id <- setdiff(sub_seq_id,sub_seq_id_exclude[i])
-	}
-}
+        ### gds file
+        gds.path <- agds_dir[chr]
+        genofile <- seqOpen(gds.path)
 
-### gds file
-gds.path <- agds_dir[chr]
-genofile <- seqOpen(gds.path)
+        genes <- genes_info
 
-genes <- genes_info
+        results_noncoding <- c()
+        for(kk in sub_seq_id)
+        {
+            print(kk)
+            gene_name <- genes_info_chr[kk,1]
+            results <- Gene_Centric_Noncoding(chr=chr,gene_name=gene_name,genofile=genofile,obj_nullmodel=obj_nullmodel,
+                                        rare_maf_cutoff=0.01,rv_num_cutoff=2,
+                                        QC_label=QC_label,variant_type=variant_type,geno_missing_imputation=geno_missing_imputation,
+                                        Annotation_dir=Annotation_dir,Annotation_name_catalog=Annotation_name_catalog,
+                                        Use_annotation_weights=Use_annotation_weights,Annotation_name=Annotation_name)
+            
+            results_noncoding <- append(results_noncoding,results)
+        }
 
-results_noncoding <- c()
-for(kk in sub_seq_id)
-{
-	print(kk)
-	gene_name <- genes_info_chr[kk,1]
-	results <- Gene_Centric_Noncoding(chr=chr,gene_name=gene_name,genofile=genofile,obj_nullmodel=obj_nullmodel,
-                                rare_maf_cutoff=0.01,rv_num_cutoff=2,
-								QC_label=QC_label,variant_type=variant_type,geno_missing_imputation=geno_missing_imputation,
-								Annotation_dir=Annotation_dir,Annotation_name_catalog=Annotation_name_catalog,
-								Use_annotation_weights=Use_annotation_weights,Annotation_name=Annotation_name)
-	
-	results_noncoding <- append(results_noncoding,results)
-}
+        save(results_noncoding, file=paste0(output_path,"/",output_file_name,"_",arrayid,".Rdata"))
 
-save(results_noncoding, file=paste0(output_path,"/",output_file_name,"_",arrayid,".Rdata"))
+        seqClose(genofile)
+        """
+    }
 
-seqClose(genofile)
+// Step 4: Sliding window analysis
+        // Input: aGDS files and the STAAR null model. For more details, please see the R script.
+        // Output: Rdata files with the user-defined names.
+        // Script: STAARpipeline_Sliding_Window.r
+        //          /nfs/team151/software/STAARpipeline_INTERVAL/final/STAARpipeline_Sliding_Window.R
 
-       
+    process slidingWindow {  
+        publishDir "${params.outdir}/step04", mode: 'copy', overwrite: false, pattern: "results_sliding_window_*.Rdata"
+        tag "arrayId - $arrayId"
+
+        input:
+            val (arrayId) 
+            file (aGDSdir) 
+            file (nullModel) 
+            file (jobNum) 
+
+        output:
+            path "*.Rdata", emit: slidingWindow_out
+
+        script:
+        """
+        #!/usr/bin/env Rscript
+    # modified the library path from lustre to docker
+        library(gdsfmt)        
+        library(SeqArray)
+        library(SeqVarTools)
+        library(STAAR)
+        library(STAARpipeline)
+        ###############################
+        #           Input
+        ###############################
+        ##  ## LOAD R OBJECTS
+            ## job nums
+        jobs_num <- get(load("${jobNum}"))
+            ## agds dir
+        agds_dir <- get(load("${aGDSdir}"))
+            ## Null Model
+        obj_nullmodel <- get(load("${nullModel}"))
+
+    ## defined in the bash 1-573
+        ## from 1 to max(cumsum(jobs_num\$sliding_window_num)) which is 573
+        arrayid <- as.numeric(${arrayId})
+
+        #### LABELS
+        # trait <- "fbc_neut"  # used in #output_path <- paste( .... and not used
+            ## QC_label                 --> used in the TRY
+        QC_label <- "annotation/info/QC_label"
+            ## variant_type             --> used in the TRY
+        variant_type <- "SNV"
+            ## geno_missing_imputation  --> used in the TRY
+        geno_missing_imputation <- "mean"
+
+        ##  ## ANNOTATION
+    # WHY? are thet for input or for output?
+            ## Annotation_dir
+        Annotation_dir <- "annotation/info/FunctionalAnnotation/FunctionalAnnotation"
+            ## Annotation channel
+        Annotation_name_catalog <- read.delim("${params.annotationNameCatalog}")
+
+    # boolean by default, maybe can be a param of pipeline ?
+            ## Use_annotation_weights
+        Use_annotation_weights <- TRUE
+    # same, why? input or output? 
+    #   is static?
+            ## Annotation name      ## size = 11
+        Annotation_name <- c("CADD","LINSIGHT","FATHMM.XF","aPC.EpigeneticActive","aPC.EpigeneticRepressed","aPC.EpigeneticTranscription",
+                            "aPC.Conservation","aPC.LocalDiversity","aPC.Mappability","aPC.TF","aPC.Protein")
+        
+        ##  ## OUTPUT
+            ## output path
+        #   output_path <- paste("/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/STAARpipeline/results/Sliding_Window/", trait, sep="")
+        output_path <- paste("./")
+        #   cmd <- paste("mkdir", output_path)
+        #   system(cmd)
+            ## output file name
+    # can be defined at the begining of the script
+        output_file_name <- paste("results_sliding_window_", "", sep="")
+
+    ## input array id from batch file               
+    #    SBATCH --array=1-573 --mem=11000
+        #arrayid <- as.numeric(commandArgs(TRUE)[1])     ## from 1 to max(cumsum(jobs_num\$sliding_window_num)) which is 573
+
+        ###############################
+        #        Main Function
+        ###############################
+        chr <- which.max(arrayid <= cumsum(jobs_num\$sliding_window_num))
+        group.num <- jobs_num\$sliding_window_num[chr]
+
+        if (chr==1){
+            groupid <- arrayid
+        }  else  {
+            groupid <- arrayid - cumsum(jobs_num\$sliding_window_num)[chr-1]
+        }
+
+        ### gds file
+        gds.path <- agds_dir[chr]
+        genofile <- seqOpen(gds.path)
+
+        start_loc <- (groupid-1)*5e6 + jobs_num\$start_loc[chr]
+        end_loc <- start_loc + 1000*25 - 1
+
+        results_sliding_window <- c()
+
+    #>>  TODO  << This should be unrapped
+    # Why it is 200 and not 2k ? -> this can be unwrapped with a ch.value(1..200)
+        for(kk in 1:200)              
+        {
+            print(kk)
+
+            start_loc_sub <- start_loc + 1000*25*(kk-1)
+            end_loc_sub <- end_loc + 1000*25*(kk-1) + 1000
+            
+            end_loc_sub <- min(end_loc_sub,jobs_num\$end_loc[chr])
+
+            # If unwrapped, all the files of results() will need to be merged after the process            
+            results <- c()
+            if(start_loc_sub < end_loc_sub)
+            {
+                results <- try(Sliding_Window(chr=chr, start_loc=start_loc_sub, end_loc=end_loc_sub, genofile=genofile, obj_nullmodel=obj_nullmodel, 
+                                type="multiple",QC_label=QC_label,variant_type=variant_type,geno_missing_imputation=geno_missing_imputation,
+                                Annotation_dir=Annotation_dir,Annotation_name_catalog=Annotation_name_catalog,
+                                Use_annotation_weights=Use_annotation_weights,Annotation_name=Annotation_name))
+                
+                if(class(results)!="try-error")
+                {
+                    results_sliding_window <- rbind(results_sliding_window,results)
+                }
+
+            }
+        }
+    # saving path '.' and NF will handle the file
+        save(results_sliding_window, file=paste0(".","/",output_file_name,"_",arrayid,".Rdata"))
+
+        seqClose(genofile)
         """
     }
 
@@ -374,4 +510,9 @@ workflow TEST {
                         fitNullModel.out.objNullModel,
                         params.variantType,
                         params.gene_missing_imputation)
+    // step 04
+    slidingWindow(arrayId_ch, 
+                aGDSdir_ch, 
+                fitNullModel.out.objNullModel, 
+                params.jobNum)
 }
