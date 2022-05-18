@@ -396,7 +396,7 @@ nextflow.enable.dsl=2
 
     ## defined in the bash 1-573
         ## from 1 to max(cumsum(jobs_num\$sliding_window_num)) which is 573
-        arrayid <- as.numeric(${arrayId})
+        arrayid <- as.numeric("${arrayId}")
 
         #### LABELS
         # trait <- "fbc_neut"  # used in #output_path <- paste( .... and not used
