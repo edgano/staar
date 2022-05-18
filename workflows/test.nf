@@ -512,7 +512,7 @@ workflow TEST {
                         params.gene_missing_imputation)
     // step 04
     slidingWindow(arrayId_ch, 
-                aGDSdir_ch, 
+                analysisPreStep.out.agds_dirFile, 
                 fitNullModel.out.objNullModel, 
                 params.jobNum)
 }
