@@ -368,8 +368,8 @@ nextflow.enable.dsl=2
         input:
             val (arrayId) 
             file (aGDSdir) 
-            file (nullModel) 
-            file (jobNum) 
+            path (nullModel) 
+            path (jobNum) 
 
         output:
             path "*.Rdata", emit: slidingWindow_out
