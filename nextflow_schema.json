@@ -113,7 +113,7 @@
                     "hidden": true
                 },
                 "singularity_use_pre_cached_images": {
-                    "type": "string",
+                    "type": "boolean",
                     "default": "true"
                 }
             }
