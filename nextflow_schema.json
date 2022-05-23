@@ -27,7 +27,7 @@
                     "default": "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/final_release_freeze_GDS/gt_phased_GDS/"
                 },
                 "AnnotationWeights": {
-                    "type": "string",
+                    "type": "boolean",
                     "default": "TRUE"
                 },
                 "ArrayId": {
