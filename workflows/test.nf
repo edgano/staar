@@ -7,7 +7,7 @@ nextflow.enable.dsl=2
 
     arrayId_ch = Channel.from( 1..2 ) // 1-573 phenotypes
 
-    slidingWindowPos_ch = Channel.from( 1..2 ) // for loop slidingWindow 1-200
+    slidingWindowPos_val = "5" // for loop slidingWindow 1-200 -> DEBUG/TEST
 
     // agdsFiles_ch = Channel.fromPath(params.agdsFiles, checkIfExists:true)
     aGDSdir_ch = Channel.fromPath(params.aGDSdir, checkIfExists:true)
@@ -460,7 +460,7 @@ nextflow.enable.dsl=2
 
     #>>  TODO  << This should be unrapped
     # Why it is 200 and not 2k ? -> this can be unwrapped with a ch.value(1..200)
-        for(kk in 1:200)              
+        for(kk in 1:${slidingWindowPos_val})              
         {
             print(kk)
 
@@ -494,8 +494,6 @@ nextflow.enable.dsl=2
 
 workflow TEST {
     //take:
-    //    arrayId
-    //    slidingWindowPos_ch
 
     //main:
     //Step 0: Preparation for association analysis of whole-genome/whole-exome sequencing studies

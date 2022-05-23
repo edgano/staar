@@ -14,20 +14,47 @@
                 "outdir"
             ],
             "properties": {
+                "annotationDir": {
+                    "type": "string",
+                    "default": "annotation/info/FunctionalAnnotation/FunctionalAnnotation"
+                },
+                "annotationNameCatalog": {
+                    "type": "string",
+                    "default": "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/STAARpipeline/data/input/Annotation_name_catalog.txt"
+                },
                 "aGDSdir": {
-                    "type": "string"
+                    "type": "string",
+                    "default": "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/final_release_freeze_GDS/gt_phased_GDS/"
+                },
+                "AnnotationWeights": {
+                    "type": "string",
+                    "default": "TRUE"
+                },
+                "ArrayId": {
+                    "type": "integer",
+                    "default": 2
                 },
                 "jobNum": {
-                    "type": "string"
+                    "type": "string",
+                    "default": "/lustre/scratch119/realdata/mdt2/projects/interval_wgs/analysis/STAARpipeline/data/input_test/jobs_num.Rdata"
                 },
-                "nullModel": {
-                    "type": "string"
+                "outdir": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
+                    "fa_icon": "fas fa-folder-open",
+                    "default": "./results"
                 },
-                "nameCatalog": {
-                    "type": "string"
+                "reportdir": {
+                    "type": "string",
+                    "default": "/Users/en6/projects/staar/reports"
                 },
-                "agdsFiles": {
-                    "type": "string"
+                "tracedir": {
+                    "type": "string",
+                    "description": "Directory to keep pipeline Nextflow logs and reports.",
+                    "default": "${params.outdir}/pipeline_info",
+                    "fa_icon": "fas fa-cogs",
+                    "hidden": true
                 }
             }
         },
@@ -49,63 +76,44 @@
             "type": "object",
             "fa_icon": "fab fa-acquisitions-incorporated",
             "description": "Set the top limit for requested resources for any single job.",
-            "help_text": "If you are running on a smaller system, a pipeline step requesting more resources than are available may cause the Nextflow to stop the run with an error. These options allow you to cap the maximum resources requested by any single job so that the pipeline will run on your system.\n\nNote that you can not _increase_ the resources requested by any job using these options. For that you will need your own configuration file. See [the nf-core website](https://nf-co.re/usage/configuration) for details.",
-            "properties": {
-                "max_cpus": {
-                    "type": "integer",
-                    "description": "Maximum number of CPUs that can be requested for any single job.",
-                    "default": 16,
-                    "fa_icon": "fas fa-microchip",
-                    "hidden": true,
-                    "help_text": "Use to set an upper-limit for the CPU requirement for each process. Should be an integer e.g. `--max_cpus 1`"
-                },
-                "max_memory": {
-                    "type": "string",
-                    "description": "Maximum amount of memory that can be requested for any single job.",
-                    "default": "128.GB",
-                    "fa_icon": "fas fa-memory",
-                    "pattern": "^\\d+(\\.\\d+)?\\.?\\s*(K|M|G|T)?B$",
-                    "hidden": true,
-                    "help_text": "Use to set an upper-limit for the memory requirement for each process. Should be a string in the format integer-unit e.g. `--max_memory '8.GB'`"
-                },
-                "max_time": {
-                    "type": "string",
-                    "description": "Maximum amount of time that can be requested for any single job.",
-                    "default": "240.h",
-                    "fa_icon": "far fa-clock",
-                    "pattern": "^(\\d+\\.?\\s*(s|m|h|day)\\s*)+$",
-                    "hidden": true,
-                    "help_text": "Use to set an upper-limit for the time requirement for each process. Should be a string in the format integer-unit e.g. `--max_time '2.h'`"
-                }
-            }
+            "help_text": "If you are running on a smaller system, a pipeline step requesting more resources than are available may cause the Nextflow to stop the run with an error. These options allow you to cap the maximum resources requested by any single job so that the pipeline will run on your system.\n\nNote that you can not _increase_ the resources requested by any job using these options. For that you will need your own configuration file. See [the nf-core website](https://nf-co.re/usage/configuration) for details."
         },
         "generic_options": {
             "title": "Generic options",
             "type": "object",
             "fa_icon": "fas fa-file-import",
             "description": "Less common options for the pipeline, typically set in a config file.",
+            "help_text": "These options are common to all nf-core pipelines and allow you to customise some of the core preferences for how the pipeline runs.\n\nTypically these options would be set in a Nextflow config file loaded for all pipeline runs, such as `~/.nextflow/config`.",
             "properties": {
-                "outdir": {
+                "qcLabel": {
                     "type": "string",
-                    "format": "directory-path",
-                    "description": "The output directory where the results will be saved. You have to use absolute paths to storage on Cloud infrastructure.",
-                    "fa_icon": "fas fa-folder-open",
-                    "default": "${projectDir}/results"
+                    "default": "annotation/info/QC_label"
                 },
-                "reportdir": {
+                "variantType": {
                     "type": "string",
-                    "fa_icon": "fas fa-folder-open",
-                    "default": "${params.outdir}/reports"
+                    "default": "SNV"
                 },
-                "tracedir": {
+                "gene_missing_imputation": {
                     "type": "string",
-                    "description": "Directory to keep pipeline Nextflow logs and reports.",
-                    "fa_icon": "fas fa-folder-open",
-                    "default": "${params.outdir}/pipeline_info"
+                    "default": "mean"
+                },
+                "trait": {
+                    "type": "string",
+                    "default": "fbc_neut"
+                },
+                "email_on_complete": {
+                    "type": "string"
+                },
+                "email_on_fail": {
+                    "type": "string",
+                    "description": "Email address for completion summary, only when pipeline fails.",
+                    "fa_icon": "fas fa-exclamation-triangle",
+                    "pattern": "^([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})$",
+                    "help_text": "An email address to send a summary email to when the pipeline is completed - ONLY sent if the pipeline does not exit successfully.",
+                    "hidden": true
                 },
                 "singularity_use_pre_cached_images": {
-                    "type": "boolean",
-                    "fa_icon": "fa-solid fa-container-storage",
+                    "type": "string",
                     "default": "true"
                 }
             }
@@ -127,12 +135,5 @@
         {
             "$ref": "#/definitions/generic_options"
         }
-    ],
-    "properties": {
-        "input_tables_column_delimiter": {
-            "type": "string",
-            "default": "\\t",
-            "hidden": true
-        }
-    }
+    ]
 }
